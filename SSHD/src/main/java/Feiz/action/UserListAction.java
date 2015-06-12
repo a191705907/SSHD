@@ -1,0 +1,55 @@
+package Feiz.action;
+import Feiz.po.User;
+import Feiz.service.UserService;
+import Feiz.util.InitApplicationContext;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+import org.springframework.context.ApplicationContext;
+
+import java.util.List;
+/**
+ * Created by zl on 1/22/2015.
+ */
+public class UserListAction extends ActionSupport{
+    private UserService userService;
+    private User user;
+    public UserListAction() {
+        ApplicationContext context = InitApplicationContext.getApplicationContext();
+        userService = (UserService) context.getBean("userService");
+    }
+    @Override
+    public String execute() throws Exception {
+        List<User> userList = userService.listAll();
+        ActionContext.getContext().getSession().put("userList" , userList);
+        System.out.println("131231231");
+        return SUCCESS;
+    }
+    public boolean isValid(String keyword) {
+        return keyword != null && keyword != "";
+    }
+    public boolean userCheck(User user) {
+        List<User> userList = userService.findUserByName(user.getName());
+        if (userList == null || userList.size() < 1) {
+            return false;
+        }
+        User checkUser = userList.get(0);
+        System.out.println(checkUser.getName());
+        if (user.getName().equals(checkUser.getName()) && user.getPassword().equals(checkUser.getPassword())) {
+            return true;
+        }
+        System.out.println("Username or password is wrong, please check!");
+        return false;
+    }
+    public UserService getUserService() {
+        return userService;
+    }
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
